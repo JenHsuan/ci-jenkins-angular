@@ -4,6 +4,7 @@ pipeline {
         stage('test-frontend') {
             steps {
               script {
+                updateGitlabCommitStatus name: 'test-frontend', state: 'running'
                 sh 'apt-get update'
                 sh 'wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
                 sh 'apt install -y ./google-chrome*.deb'
