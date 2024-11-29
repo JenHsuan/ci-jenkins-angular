@@ -1,4 +1,5 @@
 pipeline {
+    agent none
     stages {
         agent { docker { image 'node:20-bullseye' } }
         stage('build-frontend') {
