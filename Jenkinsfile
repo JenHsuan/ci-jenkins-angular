@@ -1,6 +1,6 @@
 pipeline {
-    agent { docker { image 'node:20-bullseye' } }
     stages {
+        agent { docker { image 'node:20-bullseye' } }
         stage('build-frontend') {
             steps {
               script {
@@ -21,6 +21,7 @@ pipeline {
             }
         }
         stage('test-frontend') {
+            agent { docker { image 'node:20-bullseye' } }
             steps {
               script {
                 updateGitlabCommitStatus name: 'test-frontend', state: 'running'
