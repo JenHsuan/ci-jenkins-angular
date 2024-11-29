@@ -1,6 +1,25 @@
 pipeline {
     agent { docker { image 'node:20-bullseye' } }
     stages {
+        stage('build-frontend') {
+            steps {
+              script {
+                updateGitlabCommitStatus name: 'build-frontend', state: 'running'
+                sh 'npm install'
+              }
+            }
+            post {
+                failure {
+                    updateGitlabCommitStatus name: 'build-frontend', state: 'failed'
+                    script {
+                        sh "cd ./src/ && git diff -- ."
+                    }
+                }
+                success {
+                  updateGitlabCommitStatus name: 'build-frontend', state: 'success'
+                }
+            }
+        }
         stage('test-frontend') {
             steps {
               script {
@@ -15,20 +34,20 @@ pipeline {
                 sh 'npm run test:ci'
               }
             }
-        }
-    }
-    post {
-        failure {
-            updateGitlabCommitStatus name: 'test-frontend', state: 'failed'
-            script {
-                sh "cd ./src/ && git diff -- ."
+            post {
+                failure {
+                    updateGitlabCommitStatus name: 'test-frontend', state: 'failed'
+                    script {
+                        sh "cd ./src/ && git diff -- ."
+                    }
+                }
+                success {
+                  updateGitlabCommitStatus name: 'test-frontend', state: 'success'
+                }
+                always {
+                  junit 'unit-test-results.xml'
+                }
             }
-        }
-        success {
-            updateGitlabCommitStatus name: 'test-frontend', state: 'success'
-        }
-        always {
-            junit 'unit-test-results.xml'
         }
     }
 }
